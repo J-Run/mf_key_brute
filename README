@@ -1,0 +1,3 @@
+mf_key_brute - tool for 2nd phase of multiple sector nested authentification key recovery.
+
+Define your params directly in mf_key_brute.c code.
