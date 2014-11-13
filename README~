@@ -3,6 +3,6 @@ mf_key_brute - tool for 2nd phase of multiple sector nested authentification key
 For example you have a known 4 last bytes of a key recovered with mf_nonce_brute tool.
 
 ./mf_key_brute 112233445566 1 A
-               ^-key candidate from mf_nonce_brute
+               ^-key candidate
 
 First 2 bytes of key will be bruteforced.

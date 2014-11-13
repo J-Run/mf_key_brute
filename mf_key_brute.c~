@@ -34,40 +34,17 @@ mifare_cmd 	mc;
 mftag		t;
 mfreader	r;
 
-char key_type='A';
-//////////////////////////////////////////////////////// 
 
-uint8_t Key[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; 
-uint64_t optkey =0;
+//////////////////////////////////////////////////////// dirty hardcode param definition
 
+uint8_t Key[6] = {0x00, 0x00, 0x11, 0x22, 0x33, 0x44}; // define last 4 bytes of key candidate from mf_nonce_brute
+block = 0x10;					       // block to auth
 
+mc = MC_AUTH_B;
+printf("key B\n");
 
-printf("Mifare classic nested auth key recovery. Phase 2.\n");
-
-  if (argc < 4) {
-    printf(" syntax: %s <key candidate> <block> <A|B> \n\n",argv[0]);
-    return 1;
-  }
-
-sscanf(argv[1],"%llx",&optkey);
-num_to_bytes(optkey,6,Key);
-
-sscanf(argv[2],"%d",&block);
-sscanf(argv[3],"%c",&key_type);
-
-if(key_type == 'B')
-{
-	mc = MC_AUTH_B;
-	printf("looking for key B\n");
-}
-else
-{
-	mc = MC_AUTH_A;
-	printf("looking for key A\n");
-}
-printf("block:\t%d (0x%02x)\n",block,block);
-printf("Known 4 key bytes:\t%02x %02x %02x %02x\n",Key[2], Key[3], Key[4], Key[5]);
-
+//mc = MC_AUTH_A;
+//printf("key A\n");
 
 ////////////////////////////////////////////////////////
 
@@ -285,13 +262,4 @@ long long unsigned int bytes_to_num(uint8_t *src, uint32_t len)
     src++;
   }
   return num;
-}
-
-void num_to_bytes(uint64_t n, uint32_t len, uint8_t *dest)
-{
-	while (len--)
-	{
-		dest[len] = (uint8_t) n;
-		n >>= 8;
-	}
 }
