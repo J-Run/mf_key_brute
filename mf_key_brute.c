@@ -17,11 +17,14 @@
 #include "mifare.h"
 #include "nfc-utils.h"
 #include "mf_key_brute.h"
+#include <time.h>
+
 
 nfc_context *context;
 
 int main(int argc, char *const argv[])
 {
+time_t start, now;
 
 const nfc_modulation nm = {
 	.nmt = NMT_ISO14443A,
@@ -136,9 +139,12 @@ printf("mp.mpa.abtAuthUid:\t%0x %0x %0x %0x\n",mp.mpa.abtAuthUid[0],mp.mpa.abtAu
 memcpy(mp.mpa.abtKey,Key, 6);
 printf("mp.mpa.abtKey:\t%0x %0x %0x %0x %0x %0x\n",mp.mpa.abtKey[0],mp.mpa.abtKey[1],mp.mpa.abtKey[2],mp.mpa.abtKey[3],mp.mpa.abtKey[4],mp.mpa.abtKey[5]);
 
-printf("Block:\t%0x \n",block);
+//printf("Block:\t%0x \n",block);
 int progress_cnt =0;
+int progress_cnt_last =0;
 int success =0;
+int speed =0;
+time(&start);
 for (mp.mpa.abtKey[0] = 0x00; mp.mpa.abtKey[0]<=0xff; mp.mpa.abtKey[0]++)
 {
 	mp.mpa.abtKey[1] = 0x00;
@@ -167,11 +173,20 @@ for (mp.mpa.abtKey[0] = 0x00; mp.mpa.abtKey[0]<=0xff; mp.mpa.abtKey[0]++)
 		if (mp.mpa.abtKey[1] == 0xff) break;
 		mp.mpa.abtKey[1]++;
 		progress_cnt++;
+		time(&now);		
+		if(now != start)
+		{
+			speed = progress_cnt - progress_cnt_last;
+			progress_cnt_last = progress_cnt;
+			start = now;
+		}			
 		if (progress_cnt%10 ==0) 
 		{
 			//printf("checked keys:\t%d\n",progress_cnt);
-			printf("Try #%d using Key:\t %02x %02x %02x %02x %02x %02x\t%0.2f %%\r", progress_cnt, mp.mpa.abtKey[0], mp.mpa.abtKey[1], mp.mpa.abtKey[2], mp.mpa.abtKey[3], mp.mpa.abtKey[4], mp.mpa.abtKey[5],(float)progress_cnt*0.001525902);
+				
+			printf("Try #%d using Key:\t %02x %02x %02x %02x %02x %02x\t%0.2f %%\t%d keys/sec\r", progress_cnt, mp.mpa.abtKey[0], mp.mpa.abtKey[1], mp.mpa.abtKey[2], mp.mpa.abtKey[3], mp.mpa.abtKey[4], mp.mpa.abtKey[5],(float)progress_cnt*0.001525902, speed);
 			fflush(stdout);
+			
 		}
 		
 	}
